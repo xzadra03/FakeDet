@@ -1,7 +1,7 @@
 chrome.runtime.onMessage.addListener(function (request) {
     if(request.words) {
       let receivedWords = request.words;
-      console.log("Received words in background script:", receivedWords);
+      console.log("Received words in background script");
   
       //join the words into a single string
       //use whitespace as a separator
@@ -13,20 +13,21 @@ chrome.runtime.onMessage.addListener(function (request) {
       words = filteredLines.join('\n');
       console.log(words);
 
-      const url = "https://fakedet.azurewebsites.net/api/HttpTrigger1?code=";
+      const url = "http://127.0.0.1:5000/analyze";
 
       fetch(url, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
+          'Content-Type': 'application/json'
         },
-        body: `key=${process.env.MEANINGCLOUD_API_KEY}&lang=en&txt=${words}`
+        body: JSON.stringify({text: words})
       })
 
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        console.log("Prislo to")
         return response.json();
       })
 
