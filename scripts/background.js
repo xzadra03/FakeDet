@@ -32,8 +32,8 @@ chrome.runtime.onMessage.addListener(function (request) {
       })
 
       .then(responseData => {
-        // Zde můžete zpracovat odpověď od serveru, pokud je to nutné
         console.log('Response from server:', responseData);
+        chrome.runtime.sendMessage({ type: 'serverResponse', data: responseData });
       })
       .catch(error => {
         console.error('Error when sending data to server: ', error);

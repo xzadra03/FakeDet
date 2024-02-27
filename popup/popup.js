@@ -5,10 +5,9 @@ text.addEventListener('click', async () => {
     //Get the active tab
     let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     
-    let random = Math.floor(Math.random() * 101);
 
-    statusBox.textContent = random + "%";
-    setStatusBoxColor(random);
+    statusBox.textContent = "X";
+    setStatusBoxColor(0);
     statusBox.style.display = "flex";
 
     chrome.scripting.executeScript({
@@ -17,23 +16,28 @@ text.addEventListener('click', async () => {
     });
 });
 
-function setStatusBoxColor(randomNumber) {
+function setStatusBoxColor(score){
     let color;
 
-    if(randomNumber < 20){
+    if(score < 20){
         color = 'red';
-    }else if(randomNumber < 40){
+    }else if(score < 40){
         color = 'orange';
     }
-    else if(randomNumber < 60){
+    else if(score < 60){
         color = 'yellow';
-    }else if(randomNumber < 80){
+    }else if(score < 80){
         color = 'lightgreen';
     } else {
         color = 'green';
     }
 
-    statusBox.style.backgroundColor = color;
+    statusBox.textContent = score + "%";
+    statusBox.style.backgroundColor = color; 
+}
+
+function setManTech(techniques){
+    detected_technique.textContent = techniques;
 }
 
 //function to scrape the page
@@ -54,3 +58,13 @@ function scrape(){
     //send the words to the background script
     chrome.runtime.sendMessage({words: words});
 }
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.type === 'serverResponse') {
+        // Zpracování odpovědi od background skriptu
+        console.log('Received server response in popup:', request.data);
+
+        setStatusBoxColor(request.data.score)    
+        setManTech(request.data.techniques)
+    }
+});
